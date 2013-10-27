@@ -1,0 +1,245 @@
+@charset "utf-8";
+
+/* Global */
+
+body.mceContentBody {
+	background: #FFF;
+}
+
+body
+{
+	margin: 0;
+	margin-top: 15px;
+	padding: 0;
+	font-family: Helvetica,Arial,sans-serif;
+	color: #393939;
+	font-size: 16px;
+}
+
+table
+{
+	width: 100%;
+}
+
+img
+{
+	border: 0;
+}
+
+a
+{
+	color: #1fa2d3;
+	text-decoration: none;
+}
+
+a:hover
+{
+	color: #095784;
+}
+
+span.sep
+{
+	color: #A0A0A0;
+}
+
+span.mandatory
+{
+	color: #ff6600;
+}
+	
+div.postsContainer td
+{
+	padding-bottom: 10px;
+}
+
+/* Structure */
+
+#divContainer
+{
+	width: 920px;
+	overflow: visible;
+	margin: auto;
+}
+
+#divLogo
+{
+	float:left;
+	background: url(/site/1377/ibCom_Vertical.png) no-repeat;
+	width: 57px;
+	height: 185px;
+	margin: 2px 0 0 2px;
+	cursor: pointer;
+}
+
+#divContentMain
+{
+	float:left;
+	background: url(/site/1377/ibCom_Illustration_500.jpg) no-repeat;
+	width: 500px;
+	height: 800px;
+	margin: 2px 0 0 2px;
+}
+
+#divContentSub
+{
+	float:left;
+	width: 500px;
+	height: 800px;
+	margin: 2px 0 0 2px;
+}
+
+#divContentMainFooter
+{
+	position: relative;
+	float:left;
+	top: 380px;
+	width: 500px;
+	height: 50px;
+	margin: 15px 0 0 2px;
+	font-size: 1.25em;
+	padding-left: 3px;
+	color: #999999;
+}
+
+#divContentSide
+{
+	float:left;
+	width: 250px;
+	height: 250px;
+	margin: 2px 0 0 20px;
+}
+
+#aMenuAbout
+{
+	font-size: 1.25em;
+	padding-left: 10px;
+	color: #999999;
+}
+
+span.spanMenuHome
+{
+	font-size:1.25em;
+	font-weight:bold;
+	padding-left: 3px;
+}
+
+span.spanMenuAbout
+{
+	font-size:1.25em;
+	font-weight:bold;
+	padding-left: 10px;
+}
+
+#aMenuJoinUs
+{
+	font-size: 1.25em;
+	padding-left: 10px;
+	color: #999999;
+}
+
+span.spanMenuJoinUs
+{
+	font-size: 1.25em;
+	font-weight: bold;
+	padding-left: 10px;
+}
+
+#divTileEnterprise
+{
+	float:left;
+	background: url(/site/1377/1377.enterprise.tile.active.png) no-repeat;
+	background-color: #f3f3f3;
+	width: 250px;
+	height: 100px;
+	margin: 15px 0 0 2px;
+}
+
+#divTileIntegrator
+{
+	float:left;
+	background: url(/site/1377/1377.integrator.tile.active.png) no-repeat;
+	background-color: #f3f3f3;
+	width: 250px;
+	height: 95px;
+	margin: 20px 0 0 2px;
+}
+
+#divTileDeveloper
+{
+	float:left;
+	background: url(/site/1377/1377.developer.tile.active.png) no-repeat;
+	background-color: #f3f3f3;
+	width: 250px;
+	height: 95px;
+	margin: 20px 0 0 2px;
+}
+
+div.divContent
+{
+	font-size:1em;
+	margin-top: 20px;
+	padding-left: 3px;
+	line-height:1.45em;
+}
+
+#divContent
+{
+	float: left;
+	margin-left: 15px;
+	width: 700px;
+}
+
+input.ns1blankspaceLogon
+{
+	height: 23px;
+	width: 234px;
+	font-size: 1em;
+	padding-left: 5px;
+}
+
+div.logonContainer
+{
+	font-weight: bold;
+	font-family: 'courier new', courier;
+	margin-bottom: 8px;
+}
+
+#postSearch
+{
+	height: 23px;
+	width: 234px;
+	font-size: 1em;
+	padding-left: 5px;
+}
+
+#postSearchResults
+{
+	margin-top: 10px;
+}
+
+#commentText
+{
+	width: 450px;
+	height: 150px;
+}
+
+#postText
+{
+	width: 450px;
+	height: 450px;
+}
+
+#commentSend, #postSend
+{
+	font-size: 0.875em;
+}
+
+div.post
+{
+	width: 100%;
+}
+
+#divComments
+{
+	background-color: #f5f5f5;
+}
