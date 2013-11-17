@@ -10,11 +10,19 @@ $(function()
 {	
 	$('#divLogo').click(function() {document.location.href = 'http://www.ibcom.biz'})
 
-	if (msOnDemandDocumentId == 54640)
-	{
-		nsSite1628.init({prefix: 'Add comment as '});
+	if (typeof mydigitalstructureContextId !== 'undefined')
+	{	
 		nsSite1628.context = (mydigitalstructureContextId).split(':');
 	}	
+
+	if (msOnDemandDocumentId == 54640)
+	{
+		nsSite1628.init({context: 'comment'});
+	}	
+	else if (msOnDemandDocumentId == 54693)
+	{
+		nsSite1628.init({context: 'post'});
+	}
 	else
 	{
 		nsSite1628.init();
@@ -60,31 +68,41 @@ nsSite1628.init =
 							nsSite1628.userLogonName = oResponse.userlogonname;
 						}	
 
-						var sPrefix = ns1blankspace.util.getParam(oParam, 'prefix', {"default": ''}).value;
+						var sContext = ns1blankspace.util.getParam(oParam, 'context', {"default": ''}).value;
 
 						if (nsSite1628.user == undefined)
 						{
+							if (sContext != '') {sContext = ' to ' + sContext}
 							$('div.logonContainer').html('<a href="https://ibcom-community.1blankspace.com/forum-logon">' +
-															'log on</a>')
+															'log on' + sContext + '</a>')
 						}	
 						else
 						{
-							$('div.logonContainer').html(sPrefix + nsSite1628.userLogonName);
+							if (sContext != '') {sContext = 'Add ' + sContext + ' as '}
+							$('div.logonContainer').html(sContext + nsSite1628.userLogonName +
+								'<br /><div style="cursor: pointer; color: #999999;" id="ns1blankspaceLogoffSend">log off</div>');
+
+							$('#ns1blankspaceLogoffSend')
+							.click(function() 
+							{
+								$.ajax(
+								{
+									type: 'POST',
+									url: '/ondemand/core/',
+									data: 'method=CORE_LOGOFF',
+									dataType: 'json',
+									success: function ()
+												{
+													nsSite1628.user = undefined;
+													nsSite1628.participant = undefined;
+													nsSite1628.init();
+												}	
+								});
+							});
 
 							nsSite1628.messaging.conversation.post.show();
 
-							$('div.commentContainer').html(
-								'<div style="margin-bottom:8px;"><textarea id="commentText"></textarea></div>' +
-								'<div id="commentSend"></div>');
-
-							$('#commentSend').button(
-							{
-								label: "Send Comment"
-							})
-							.click(function() 
-							{
-								nsSite1628.messaging.conversation.comment.send();
-							});
+							nsSite1628.messaging.conversation.comment.show();
 						}
 					}	
 				}
@@ -182,6 +200,62 @@ nsSite1628.logon =
 
 nsSite1628.messaging.conversation =
 {
+	participant: {
+					init: 	function (oParam, oResponse)
+							{
+								if (nsSite1628.user !== undefined && nsSite1628.participant == undefined)
+								{	
+									if (oResponse == undefined) 
+									{
+										var oSearch = new AdvancedSearch();
+										oSearch.method = 'MESSAGING_CONVERSATION_PARTICIPANT_SEARCH';
+										oSearch.addField('user');
+										oSearch.addFilter('user', 'EQUAL_TO', nsSite1628.user);
+										oSearch.addFilter('conversation', 'EQUAL_TO', nsSite1628.conversation);
+										oSearch.addCustomOption('conversation', nsSite1628.conversation);
+										oSearch.getResults(function (data) {nsSite1628.messaging.conversation.participant.init(oParam, data)});
+									}
+									else
+									{
+										if (oResponse.data.rows.length == 0)
+										{
+											var oData =
+											{
+												conversation: nsSite1628.conversation,
+												user: nsSite1628.user
+											}	
+												
+											$.ajax(
+											{
+												type: 'POST',
+												url: '/rpc/messaging/?method=MESSAGING_CONVERSATION_PARTICIPANT_MANAGE',
+												data: oData,
+												dataType: 'json',
+												success: function(data)
+												{
+													if (data.status == 'OK')
+													{
+														nsSite1628.participant = oResponse.id;
+													}
+													else
+													{
+
+													}
+
+													ns1blankspace.util.onComplete(oParam);
+												}
+											});	
+										}
+									}	
+								}
+								else
+								{
+									ns1blankspace.util.onComplete(oParam);
+								}
+									
+							}
+				},				
+
 	post: 		{
 					search: 	function (oParam, oResponse)
 								{
@@ -226,7 +300,11 @@ nsSite1628.messaging.conversation =
 					show: 		function()
 								{
 									$('div.postContainer').html(
-										'<div style="margin-bottom:8px;"><textarea id="postText"></textarea></div>' +
+										'<div style="margin-bottom:8px; margin-top:12px;">' +
+										'<input id="postSubject"></div>' +
+										'<div style="margin-bottom:8px;">' +
+										'<textarea id="postText"></textarea>' +
+										'</div>' +
 										'<div id="postSend"></div>');
 
 									$('#postSend').button(
@@ -235,16 +313,21 @@ nsSite1628.messaging.conversation =
 									})
 									.click(function() 
 									{
-										nsSite1628.messaging.conversation.post.send();
+										nsSite1628.messaging.conversation.participant.init(
+										{
+											onComplete: nsSite1628.messaging.conversation.post.send
+										});
+										//nsSite1628.messaging.conversation.post.send();
 									});
 								},
 
-					send:XXX		function(oParam, oResponse)
+					send:		function(oParam, oResponse)
 								{
 									var oData =
 									{
-										message: $('#commentText').val(),
-										post: nsSite1628.context[1]
+										conversation: nsSite1628.conversation,
+										subject: $('#postSubject').val(),
+										message: $('#postText').val()
 									}	
 										
 									$('div.commentContainer').html(nsSite1628.loading);
@@ -252,18 +335,18 @@ nsSite1628.messaging.conversation =
 									$.ajax(
 									{
 										type: 'POST',
-										url: '/ondemand/messaging/?method=MESSAGING_CONVERSATION_POST_COMMENT_MANAGE',
+										url: '/ondemand/messaging/?method=MESSAGING_CONVERSATION_POST_MANAGE',
 										data: oData,
 										dataType: 'json',
 										success: function(data)
 										{
 											if (data.status == 'OK')
 											{
-												$('div.commentContainer').html('Comment sent.');
+												$('div.postContainer').html('Post sent.');
 											}
 											else
 											{
-												$('div.commentContainer').html('Comment could not be sent.');
+												$('div.postContainer').html('Post could not be sent.');
 											}	
 										}
 									});	
@@ -271,6 +354,26 @@ nsSite1628.messaging.conversation =
 				},
 
 	comment: 	{
+					show: 		function ()
+								{
+									$('div.commentContainer').html(
+										'<div style="margin-bottom:8px;"><textarea id="commentText"></textarea></div>' +
+										'<div id="commentSend"></div>');
+
+									$('#commentSend').button(
+									{
+										label: "Send Comment"
+									})
+									.click(function() 
+									{
+										nsSite1628.messaging.conversation.participant.init(
+										{
+											onComplete: nsSite1628.messaging.conversation.comment.send
+										});
+										//nsSite1628.messaging.conversation.comment.send();
+									});
+								},
+
 					send: 		function(oParam, oResponse)
 								{
 									var oData =
